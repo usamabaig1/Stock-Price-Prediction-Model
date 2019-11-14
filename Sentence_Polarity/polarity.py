@@ -16,7 +16,7 @@ import nltk
 import string
 import sys
 from terminal_colors import Tcolors
-from stemming.porter2 import stem 
+from nltk.stem import PorterStemmer
 sys.path.append(sys.path[0] + "/../")
 
 
@@ -222,6 +222,7 @@ class PolarityClassifier:
         return False                   
     
     def tokenize_words(self, sentence):
+        porter = PorterStemmer()
         words = nltk.word_tokenize(sentence.lower())
         self.stokens = sentence.split()
         for i,word in enumerate(words):
@@ -234,10 +235,11 @@ class PolarityClassifier:
             # Handle punctuation in word_tokenization
             if TAG and TAG.startswith("VB"):   
             	if word in words:      
-                	words[words.index(word)] = stem(word)
+                	words[words.index(word)] = porter.stem(word)
         return words
     
     def word_sense_disambiguation(self):
+        porter = PorterStemmer()
         """
         Disambiguate words in a sentence if only if the POS tag of the word matches
         the POS tag in the lexicon
@@ -248,7 +250,7 @@ class PolarityClassifier:
                 word = word[0:(len(word)-1)]
             matched_tag = self.match_tags(TAG)
             word = word.lower()
-            words = [word, stem(word)]
+            words = [word, porter.stem(word)]
             for w in words: 
                 if self.feature_words.has_key(w) and (matched_tag in self.lexicon[w]["pos1"] \
                                                          or self.lexicon[w]["pos1"][0] == "anypos" \

@@ -14,7 +14,7 @@
 import sys
 import nltk
 from lexicon import Lexicon    
-from stemming.porter2 import stem
+from nltk.stem import PorterStemmer
 
 class HpSubj:
     """
@@ -28,13 +28,14 @@ class HpSubj:
         self.debug = debug
         
     def classify(self, sentence):
+        porter = PorterStemmer()
         wdict = self.dictionary
         words = nltk.word_tokenize(sentence)
         strong_subjective_words_count = 0
         subjective = False
         for word in words: 
             word = word.lower()
-            check = [word, stem(word)]
+            check = [word, porter.stem(word)]
             for w in check: 
                 if wdict.has_key(w) and wdict[w]['type'] == 'strongsubj':
                     strong_subjective_words_count += 1
@@ -59,6 +60,7 @@ class HpObj:
         self.debug = debug
     
     def classify(self, current, previous="", next=""):
+        porter = PorterStemmer()
         if self.debug:
             print 
             print "current:", current
@@ -76,7 +78,7 @@ class HpObj:
         
         for word in words: 
             word = word.lower()
-            check = [word, stem(word)]
+            check = [word, porter.stem(word)]
             for w in check: 
                 if wdict.has_key(w):
                     if wdict[w]['type'] == 'strongsubj':

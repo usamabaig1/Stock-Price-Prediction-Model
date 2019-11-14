@@ -24,6 +24,7 @@ from terminal_colors import Tcolors
 import pandas as pd
 import traceback
 
+
 DEBUG = False
 
 class Sentiment:
@@ -237,15 +238,27 @@ if __name__ == '__main__':
 if __name__ == '__main__':       
     sentiment = Sentiment()
     sentence_polarity_infomap = {}
-    filepath = 'stocknews/Combined_News_DJIA.csv'
+    filepath = 'Today_Headlines.csv'
     combined_stock_data = pd.read_csv(filepath)
-    combined_stock_data['Para'] = combined_stock_data['Top1']
-    for x in range(2, 26):
-        combined_stock_data['Para'] += combined_stock_data['Top'+str(x)]
+    myPara = ''
 
-    for index, sentence in combined_stock_data['Para'].iteritems():
+    for x in range(len(combined_stock_data['Title'])):
+        #combined_stock_data['para'] += combined_stock_data['Title']
+        myPara += combined_stock_data['Title'][x]
+
+    index  = 0;
+    sentence_polarity_infomap = sentiment.analyze([myPara])
+    if not (sentence_polarity_infomap == {}):
+        combined_stock_data.at[index, 'Subjectivity'] = sentence_polarity_infomap['subjective']
+        combined_stock_data.at[index, 'Objectivity'] = sentence_polarity_infomap['objective']
+        combined_stock_data.at[index, 'Positive'] = sentence_polarity_infomap['positive']
+        combined_stock_data.at[index, 'Neutral'] = sentence_polarity_infomap['neutral']
+        combined_stock_data.at[index, 'Negative'] = sentence_polarity_infomap['negative']
+
+    """
+    for index, sentence in combined_stock_data['para'].iteritems():
         sentence_polarity_infomap = sentiment.analyze([sentence])
-        print "polarity" + str(sentence_polarity_infomap)
+        #print "polarity" + str(sentence_polarity_infomap)
         if not (sentence_polarity_infomap == {}):
             combined_stock_data.at[index, 'Subjectivity'] = sentence_polarity_infomap['subjective']
             combined_stock_data.at[index, 'Objectivity'] = sentence_polarity_infomap['objective']
@@ -253,12 +266,13 @@ if __name__ == '__main__':
             combined_stock_data.at[index, 'Neutral'] = sentence_polarity_infomap['neutral']
             combined_stock_data.at[index, 'Negative'] = sentence_polarity_infomap['negative']
         #combined_stock_data['Subjectivity'][index] = sentence_polarity_infomap['subjective']
-        """
+    """
+    """
         combined_stock_data['Objectivity'][index] = sentence_polarity_infomap['objective']
         combined_stock_data['Positive'][index] = sentence_polarity_infomap['positive']
         combined_stock_data['Neutral'][index] = sentence_polarity_infomap['neutral']
         combined_stock_data['Negative'][index] = sentence_polarity_infomap['negative']
-        """
+    """
     print combined_stock_data['Subjectivity'].shape
     print combined_stock_data['Objectivity'].shape
     print combined_stock_data['Positive'].shape
@@ -269,4 +283,5 @@ if __name__ == '__main__':
     print combined_stock_data['Positive'].head(20)
     print combined_stock_data['Neutral'].head(20)
     print combined_stock_data['Negative'].head(20)
-    combined_stock_data.to_csv('combined_stock_data.csv')
+    combined_stock_data.to_csv("TodaySentiments.csv", sep=',', encoding='utf-8')
+
